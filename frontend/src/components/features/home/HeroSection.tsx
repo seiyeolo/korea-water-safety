@@ -28,7 +28,7 @@ export function HeroSection() {
               교육 프로그램 보기
             </Link>
             <Link
-              href="/certifications"
+              href="/certificates"
               className="w-full rounded-lg border-2 border-white px-8 py-4 text-lg font-semibold text-white transition-all hover:bg-white hover:text-primary-600 sm:w-auto"
             >
               자격증 안내
