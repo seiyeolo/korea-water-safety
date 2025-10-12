@@ -4,10 +4,27 @@ import { useState, useMemo } from 'react';
 import { NoticeFiltersComponent } from '@/components/features/notices/NoticeFilters';
 import { NoticeListItem } from '@/components/features/notices/NoticeListItem';
 import { Pagination } from '@/components/common/Pagination';
-import { notices } from '@/data/notices';
+import { usePosts } from '@/hooks/usePosts';
 import { NoticeFilters } from '@/types/notice';
+import type { Post } from '@/types/api';
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 20;
+
+// 백엔드 Post 카테고리를 프론트엔드 Notice 카테고리로 매핑
+const categoryMap: Record<Post['category'], string> = {
+  NOTICE: 'general',
+  NEWS: 'general',
+  EVENT: 'event',
+  FAQ: 'general',
+};
+
+// 프론트엔드 카테고리를 백엔드 카테고리로 역변환
+const reverseCategoryMap: Record<string, Post['category'] | undefined> = {
+  general: 'NOTICE',
+  education: 'NEWS',
+  certification: 'NEWS',
+  event: 'EVENT',
+};
 
 export default function NoticesPage() {
   const [filters, setFilters] = useState<NoticeFilters>({
@@ -16,24 +33,46 @@ export default function NoticesPage() {
   });
   const [currentPage, setCurrentPage] = useState(1);
 
-  // 필터링된 공지사항 목록
+  // 백엔드 API 카테고리 파라미터 설정
+  const backendCategory = filters.category === 'all' ? undefined : reverseCategoryMap[filters.category || 'general'];
+
+  // 백엔드 API에서 게시글 데이터 가져오기
+  const { posts, loading, error, pagination } = usePosts({
+    category: backendCategory,
+    page: currentPage,
+    limit: ITEMS_PER_PAGE,
+  });
+
+  // 백엔드 Post를 프론트엔드 Notice 형식으로 변환
+  const mappedNotices = useMemo(() => {
+    return posts.map((post) => ({
+      id: post.id,
+      title: post.title,
+      category: categoryMap[post.category] as 'general' | 'education' | 'certification' | 'event',
+      content: post.content,
+      author: post.author?.name || '관리자',
+      createdAt: post.publishedAt || post.createdAt,
+      views: post.views,
+      isPinned: post.isPinned,
+      attachments: post.attachments?.map((att) => ({
+        id: att.id,
+        name: att.originalFilename,
+        size: att.size,
+        url: att.url,
+      })),
+    }));
+  }, [posts]);
+
+  // 클라이언트 사이드 검색어 필터링 (백엔드에서 검색 지원하지 않는 경우)
   const filteredNotices = useMemo(() => {
-    return notices.filter((notice) => {
-      // 카테고리 필터
-      if (filters.category && filters.category !== 'all') {
-        if (notice.category !== filters.category) return false;
-      }
+    if (!filters.searchQuery) return mappedNotices;
 
-      // 검색어 필터
-      if (filters.searchQuery) {
-        const query = filters.searchQuery.toLowerCase();
-        const searchable = `${notice.title} ${notice.content}`.toLowerCase();
-        if (!searchable.includes(query)) return false;
-      }
-
-      return true;
+    const query = filters.searchQuery.toLowerCase();
+    return mappedNotices.filter((notice) => {
+      const searchable = `${notice.title} ${notice.content}`.toLowerCase();
+      return searchable.includes(query);
     });
-  }, [filters]);
+  }, [mappedNotices, filters.searchQuery]);
 
   // 고정 공지와 일반 공지 분리 및 정렬
   const sortedNotices = useMemo(() => {
@@ -42,18 +81,21 @@ export default function NoticesPage() {
     return [...pinned, ...regular];
   }, [filteredNotices]);
 
-  // 페이지네이션
-  const totalPages = Math.ceil(sortedNotices.length / ITEMS_PER_PAGE);
-  const paginatedNotices = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return sortedNotices.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [sortedNotices, currentPage]);
-
   // 필터 변경 시 첫 페이지로
   const handleFilterChange = (newFilters: NoticeFilters) => {
     setFilters(newFilters);
     setCurrentPage(1);
   };
+
+  // 페이지 변경 핸들러
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // 총 페이지 수 (백엔드 pagination 사용)
+  const totalPages = pagination?.totalPages || 1;
+  const totalCount = pagination?.total || sortedNotices.length;
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -67,8 +109,13 @@ export default function NoticesPage() {
             </p>
             <div className="mt-8 flex justify-center gap-4 text-sm">
               <div className="rounded-full bg-white/20 px-4 py-2 backdrop-blur-sm">
-                총 {notices.length}개 게시글
+                총 {totalCount}개 게시글
               </div>
+              {loading && (
+                <div className="rounded-full bg-white/20 px-4 py-2 backdrop-blur-sm">
+                  데이터 로딩 중...
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -86,13 +133,23 @@ export default function NoticesPage() {
               />
             </div>
 
+            {/* 에러 메시지 */}
+            {error && (
+              <div className="mb-6 rounded-lg bg-red-50 p-4 text-red-800">
+                <h3 className="mb-2 font-semibold">데이터를 불러오는 중 오류가 발생했습니다</h3>
+                <p className="text-sm">{error.message}</p>
+              </div>
+            )}
+
             {/* 검색 결과 헤더 */}
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-2xl font-bold text-gray-900">
-                {filteredNotices.length > 0 ? (
+                {loading ? (
+                  <span className="text-gray-400">로딩 중...</span>
+                ) : sortedNotices.length > 0 ? (
                   <>
                     <span className="text-primary-600">
-                      {filteredNotices.length}
+                      {totalCount}
                     </span>
                     개의 공지사항
                   </>
@@ -101,18 +158,37 @@ export default function NoticesPage() {
                 )}
               </h2>
               <div className="text-sm text-gray-600">
-                {currentPage} / {totalPages || 1} 페이지
+                {currentPage} / {totalPages} 페이지
               </div>
             </div>
 
-            {/* 공지사항 목록 */}
-            {paginatedNotices.length > 0 ? (
+            {/* 로딩 상태 */}
+            {loading && (
               <div className="space-y-4">
-                {paginatedNotices.map((notice) => (
+                {[...Array(5)].map((_, index) => (
+                  <div
+                    key={index}
+                    className="animate-pulse rounded-lg bg-white p-6 shadow-md"
+                  >
+                    <div className="mb-4 h-4 w-1/4 rounded bg-gray-200"></div>
+                    <div className="mb-2 h-6 w-3/4 rounded bg-gray-300"></div>
+                    <div className="h-4 w-full rounded bg-gray-200"></div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 공지사항 목록 */}
+            {!loading && sortedNotices.length > 0 && (
+              <div className="space-y-4">
+                {sortedNotices.map((notice) => (
                   <NoticeListItem key={notice.id} notice={notice} />
                 ))}
               </div>
-            ) : (
+            )}
+
+            {/* 검색 결과 없음 */}
+            {!loading && sortedNotices.length === 0 && (
               <div className="rounded-lg bg-white p-12 text-center shadow-md">
                 <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
                   <svg
@@ -147,12 +223,12 @@ export default function NoticesPage() {
             )}
 
             {/* 페이지네이션 */}
-            {paginatedNotices.length > 0 && (
+            {!loading && sortedNotices.length > 0 && (
               <div className="mt-8">
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
-                  onPageChange={setCurrentPage}
+                  onPageChange={handlePageChange}
                 />
               </div>
             )}
