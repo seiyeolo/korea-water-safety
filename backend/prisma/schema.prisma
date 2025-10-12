@@ -1,0 +1,253 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== Enum Types ====================
+
+enum UserRole {
+  USER         // 일반 회원
+  INSTRUCTOR   // 강사
+  ADMIN        // 관리자
+}
+
+enum UserStatus {
+  ACTIVE       // 활성
+  INACTIVE     // 비활성
+  SUSPENDED    // 정지
+}
+
+enum RegistrationStatus {
+  PENDING      // 대기
+  CONFIRMED    // 확정
+  COMPLETED    // 수료
+  CANCELLED    // 취소
+}
+
+enum CertificateType {
+  NATIONAL     // 국가자격증
+  PRIVATE      // 민간자격증
+}
+
+enum CertificateStatus {
+  ACTIVE       // 유효
+  EXPIRED      // 만료
+  REVOKED      // 취소
+}
+
+enum PostCategory {
+  NOTICE       // 공지사항
+  NEWS         // 새소식
+  EVENT        // 행사
+  FAQ          // 자주 묻는 질문
+}
+
+enum PostStatus {
+  DRAFT        // 임시저장
+  PUBLISHED    // 게시
+  ARCHIVED     // 보관
+}
+
+// ==================== Models ====================
+
+// 회원 모델
+model User {
+  id                String              @id @default(cuid())
+  email             String              @unique
+  password          String
+  name              String
+  phone             String?
+  birthDate         DateTime?
+  address           String?
+  role              UserRole            @default(USER)
+  status            UserStatus          @default(ACTIVE)
+
+  // 관계
+  registrations     Registration[]
+  certificates      Certificate[]
+  posts             Post[]              @relation("PostAuthor")
+
+  // 타임스탬프
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  lastLoginAt       DateTime?
+
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+// 교육 프로그램 모델
+model EducationProgram {
+  id                String              @id @default(cuid())
+  title             String
+  description       String              @db.Text
+  content           String              @db.Text
+  instructorName    String
+  duration          Int                 // 교육 기간 (시간)
+  capacity          Int                 // 정원
+  price             Int                 // 가격
+
+  // 교육 장소 정보
+  location          String
+  address           String
+
+  // 이미지
+  thumbnailUrl      String?
+  imageUrls         String[]            @default([])
+
+  // 교육 일정
+  startDate         DateTime
+  endDate           DateTime
+
+  // 모집 기간
+  recruitStartDate  DateTime
+  recruitEndDate    DateTime
+
+  // 상태
+  isActive          Boolean             @default(true)
+
+  // 관계
+  registrations     Registration[]
+
+  // 타임스탬프
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  @@index([startDate])
+  @@index([isActive])
+  @@map("education_programs")
+}
+
+// 교육 신청 모델
+model Registration {
+  id                String              @id @default(cuid())
+
+  // 관계
+  userId            String
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  programId         String
+  program           EducationProgram    @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  // 신청 정보
+  status            RegistrationStatus  @default(PENDING)
+  paymentAmount     Int
+  isPaid            Boolean             @default(false)
+  paidAt            DateTime?
+
+  // 수료 정보
+  completedAt       DateTime?
+  certificateIssued Boolean             @default(false)
+
+  // 메모
+  memo              String?             @db.Text
+
+  // 타임스탬프
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  @@index([userId])
+  @@index([programId])
+  @@index([status])
+  @@map("registrations")
+}
+
+// 자격증 모델
+model Certificate {
+  id                String              @id @default(cuid())
+
+  // 관계
+  userId            String
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 자격증 정보
+  certificateNumber String              @unique
+  certificateName   String
+  type              CertificateType
+  status            CertificateStatus   @default(ACTIVE)
+
+  // 발급 정보
+  issueDate         DateTime
+  expiryDate        DateTime?
+
+  // 파일
+  certificateUrl    String?
+
+  // 비고
+  remarks           String?             @db.Text
+
+  // 타임스탬프
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  @@index([userId])
+  @@index([certificateNumber])
+  @@index([type])
+  @@index([status])
+  @@map("certificates")
+}
+
+// 게시글 모델
+model Post {
+  id                String              @id @default(cuid())
+
+  // 관계
+  authorId          String
+  author            User                @relation("PostAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  // 게시글 정보
+  title             String
+  content           String              @db.Text
+  category          PostCategory
+  status            PostStatus          @default(DRAFT)
+
+  // 메타 정보
+  views             Int                 @default(0)
+  isPinned          Boolean             @default(false)
+
+  // 관계
+  attachments       Attachment[]
+
+  // 게시 기간
+  publishedAt       DateTime?
+
+  // 타임스탬프
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  @@index([category])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([isPinned])
+  @@map("posts")
+}
+
+// 첨부파일 모델
+model Attachment {
+  id                String              @id @default(cuid())
+
+  // 관계
+  postId            String
+  post              Post                @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  // 파일 정보
+  filename          String
+  originalFilename  String
+  mimeType          String
+  size              Int                 // bytes
+  url               String
+
+  // 타임스탬프
+  createdAt         DateTime            @default(now())
+
+  @@index([postId])
+  @@map("attachments")
+}
