@@ -1,5 +1,3 @@
-import Image from 'next/image';
-
 export function PresidentMessageSection() {
   return (
     <section className="bg-white py-16">

@@ -1,4 +1,4 @@
-import { Award, CheckCircle, Clock, Building, Calendar } from 'lucide-react';
+import { Award, CheckCircle, Building, Calendar } from 'lucide-react';
 import { Certificate } from '@/types/certificate';
 
 interface CertificateCardProps {

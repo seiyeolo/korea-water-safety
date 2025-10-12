@@ -1,14 +1,12 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import {
   Calendar,
   Clock,
   Users,
   MapPin,
-  DollarSign,
-  BookOpen,
   CheckCircle,
   AlertCircle,
   ArrowLeft,
@@ -19,7 +17,6 @@ import { programs, getCategoryLabel, getLevelLabel } from '@/data/programs';
 
 export default function ProgramDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const programId = params.id as string;
 
   const program = programs.find((p) => p.id === programId);

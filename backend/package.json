@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node src/index.ts",
+    "dev": "ts-node -r tsconfig-paths/register src/main.ts",
+    "start:dev": "ts-node -r tsconfig-paths/register src/main.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node dist/main.js",
+    "start:prod": "node dist/main.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
@@ -20,12 +22,21 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@prisma/client": "^6.17.1"
+    "@nestjs/common": "^11.1.6",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.1.6",
+    "@nestjs/platform-express": "^11.1.6",
+    "@prisma/client": "^6.17.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
   },
   "devDependencies": {
     "@types/node": "^24.7.2",
     "prisma": "^6.17.1",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3"
   }
 }
