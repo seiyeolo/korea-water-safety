@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User, LogOut } from 'lucide-react';
 
 const navigation = [
   { name: '협회소개', href: '/about' },
@@ -13,6 +13,21 @@ const navigation = [
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    // localStorage에서 사용자 정보 가져오기
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
+    window.location.href = '/';
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b bg-white shadow-sm">
@@ -28,18 +43,54 @@ export function Header() {
           </Link>
 
           {/* 데스크톱 네비게이션 */}
-          <ul className="hidden space-x-8 md:flex">
-            {navigation.map((item) => (
-              <li key={item.name}>
-                <Link
-                  href={item.href}
-                  className="text-gray-700 transition-colors hover:text-primary-600"
-                >
-                  {item.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <div className="hidden items-center space-x-8 md:flex">
+            <ul className="flex space-x-8">
+              {navigation.map((item) => (
+                <li key={item.name}>
+                  <Link
+                    href={item.href}
+                    className="text-gray-700 transition-colors hover:text-primary-600"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            {/* 로그인/회원가입 또는 사용자 정보 */}
+            <div className="flex items-center space-x-4">
+              {user ? (
+                <>
+                  <span className="flex items-center gap-2 text-sm text-gray-700">
+                    <User className="h-4 w-4" />
+                    {user.name}님
+                  </span>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    로그아웃
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="text-sm font-medium text-gray-700 transition-colors hover:text-primary-600"
+                  >
+                    로그인
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-700"
+                  >
+                    회원가입
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
 
           {/* 모바일 햄버거 메뉴 버튼 */}
           <button
@@ -72,6 +123,45 @@ export function Header() {
                 </li>
               ))}
             </ul>
+
+            {/* 모바일 로그인/회원가입 */}
+            <div className="mt-4 space-y-3 border-t pt-4">
+              {user ? (
+                <>
+                  <div className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700">
+                    <User className="h-4 w-4" />
+                    {user.name}님
+                  </div>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex w-full items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    로그아웃
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="block rounded-lg px-4 py-2 text-center text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    로그인
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="block rounded-lg bg-primary-600 px-4 py-2 text-center text-sm font-medium text-white transition-colors hover:bg-primary-700"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    회원가입
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         )}
       </nav>
