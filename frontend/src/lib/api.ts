@@ -14,7 +14,7 @@ import type {
 } from '@/types/api';
 
 // API 베이스 URL 설정
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const API_BASE_URL = 'https://strong-wholeness-production.up.railway.app/api';
 
 // Axios 인스턴스 생성
 const apiClient: AxiosInstance = axios.create({
