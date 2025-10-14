@@ -33,7 +33,7 @@ export function CertificateLookupForm() {
     setResults([]);
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
       const params = new URLSearchParams({
         name,
         birthDate,
@@ -41,7 +41,7 @@ export function CertificateLookupForm() {
       });
 
       const response = await fetch(
-        `${API_URL}/api/certificates/lookup?${params.toString()}`
+        `${API_URL}/certificates/lookup?${params.toString()}`
       );
 
       if (!response.ok) {
