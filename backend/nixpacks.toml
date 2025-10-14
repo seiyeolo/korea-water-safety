@@ -11,4 +11,4 @@ cmds = [
 ]
 
 [start]
-cmd = "npx prisma migrate deploy && npm run seed:prod && npm start"
+cmd = "./scripts/start.sh"
