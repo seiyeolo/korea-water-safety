@@ -5,13 +5,14 @@
   "scripts": {
     "dev": "ts-node -r tsconfig-paths/register src/main.ts",
     "start:dev": "ts-node -r tsconfig-paths/register src/main.ts",
-    "build": "tsc",
+    "build": "tsc && prisma generate",
     "start": "node dist/main.js",
     "start:prod": "node dist/main.js",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
+    "postinstall": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node prisma/seed.ts",
+    "seed:prod": "node dist/prisma/seed.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "prisma": {

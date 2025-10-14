@@ -5,17 +5,14 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Starting database seeding...\n');
 
-  // 기존 데이터 삭제 (개발 환경에서만)
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🧹 Cleaning existing data...');
-    await prisma.attachment.deleteMany();
-    await prisma.post.deleteMany();
-    await prisma.certificate.deleteMany();
-    await prisma.registration.deleteMany();
-    await prisma.educationProgram.deleteMany();
-    await prisma.user.deleteMany();
-    console.log('✅ Existing data cleaned\n');
+  // 기존 데이터 확인 - 이미 데이터가 있으면 스킵
+  const existingUsers = await prisma.user.count();
+  if (existingUsers > 0) {
+    console.log('✅ Database already has data, skipping seed...\n');
+    return;
   }
+
+  console.log('🧹 Database is empty, starting seed...\n');
 
   // 1. 테스트 관리자 계정 생성
   console.log('👤 Creating admin account...');
