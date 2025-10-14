@@ -8,7 +8,7 @@ async function bootstrap() {
   // CORS 설정 - 정규식 패턴 지원
   const corsPatterns = process.env.CORS_ORIGIN
     ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
-    : ['http://localhost:3000'];
+    : ['http://localhost:3000', 'https://frontend-.*-seiyeolo-6781s-projects.vercel.app'];
 
   // 패턴을 정규식으로 변환
   const allowedOrigins = corsPatterns.map(pattern => {
