@@ -2,7 +2,7 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "npm ci --prefer-offline --no-audit && npm run build && ls -la dist/modules/users/dto/register.dto.js"
+    "buildCommand": "rm -rf node_modules/.cache && npm ci --no-cache --no-audit && npm run build"
   },
   "deploy": {
     "startCommand": "./scripts/start.sh",
