@@ -27,7 +27,7 @@ export class AuthService {
    */
   generateAccessToken(payload: JwtPayload): string {
     return this.jwtService.sign(payload, {
-      expiresIn: '24h',
+      expiresIn: 86400, // 24 hours in seconds
     });
   }
 
@@ -36,7 +36,7 @@ export class AuthService {
    */
   generateRefreshToken(payload: JwtPayload): string {
     return this.jwtService.sign(payload, {
-      expiresIn: '7d',
+      expiresIn: 604800, // 7 days in seconds
     });
   }
 
