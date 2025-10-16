@@ -1,5 +1,5 @@
 import { IsEmail, IsString, MinLength, IsOptional, Matches } from 'class-validator';
-import { IsStrongPassword } from '@/common/decorators/is-strong-password.decorator';
+import { IsStrongPassword } from '../../common/decorators/is-strong-password.decorator';
 
 export class RegisterDto {
   @IsEmail({}, { message: '유효한 이메일 주소를 입력해주세요' })
