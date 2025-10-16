@@ -4,10 +4,14 @@ import { UserStatus } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly authService: AuthService,
+  ) {}
 
   async findAll() {
     return this.prisma.user.findMany({
@@ -116,8 +120,8 @@ export class UsersService {
       throw new ConflictException('이미 사용 중인 이메일입니다');
     }
 
-    // 비밀번호 해싱
-    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    // 비밀번호 해싱 (라운드: 12 - 보안 강화)
+    const hashedPassword = await bcrypt.hash(registerDto.password, 12);
 
     // 회원 생성
     const user = await this.prisma.user.create({
@@ -138,10 +142,18 @@ export class UsersService {
       },
     });
 
+    // JWT 토큰 생성
+    const { accessToken, refreshToken, expiresIn, refreshTokenExpiry } =
+      this.authService.generateAuthResponse(user);
+
     return {
       success: true,
       message: '회원가입이 완료되었습니다',
       user,
+      accessToken,
+      refreshToken,
+      expiresIn,
+      refreshTokenExpiry,
     };
   }
 
@@ -166,8 +178,12 @@ export class UsersService {
     }
 
     // 계정 상태 확인
-    if (user.status !== UserStatus.ACTIVE) {
-      throw new UnauthorizedException('비활성화된 계정입니다');
+    if (user.status === UserStatus.SUSPENDED) {
+      throw new UnauthorizedException('정지된 계정입니다. 관리자에게 문의해주세요');
+    }
+
+    if (user.status === UserStatus.INACTIVE) {
+      throw new UnauthorizedException('비활성화된 계정입니다. 이메일 인증이 필요합니다');
     }
 
     // 마지막 로그인 시간 업데이트
@@ -179,10 +195,18 @@ export class UsersService {
     // 비밀번호 제외하고 반환
     const { password, ...userWithoutPassword } = user;
 
+    // JWT 토큰 생성
+    const { accessToken, refreshToken, expiresIn, refreshTokenExpiry } =
+      this.authService.generateAuthResponse(userWithoutPassword);
+
     return {
       success: true,
       message: '로그인에 성공했습니다',
       user: userWithoutPassword,
+      accessToken,
+      refreshToken,
+      expiresIn,
+      refreshTokenExpiry,
     };
   }
 

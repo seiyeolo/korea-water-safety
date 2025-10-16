@@ -26,14 +26,14 @@ const apiClient: AxiosInstance = axios.create({
   withCredentials: true, // CORS credentials 포함
 });
 
-// 요청 인터셉터 (선택사항: 인증 토큰 추가 등)
+// 요청 인터셉터 (JWT 토큰 추가)
 apiClient.interceptors.request.use(
   (config) => {
-    // 로컬 스토리지에서 토큰 가져오기 (향후 인증 구현 시)
-    // const token = localStorage.getItem('token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    // 로컬 스토리지에서 토큰 가져오기
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
@@ -41,19 +41,54 @@ apiClient.interceptors.request.use(
   }
 );
 
-// 응답 인터셉터 (에러 핸들링)
+// 에러 응답 타입
+interface ApiErrorResponse {
+  error?: {
+    code: string;
+    message: string;
+    details?: Record<string, string[]>;
+  };
+  message?: string;
+  statusCode?: number;
+}
+
+// 응답 인터셉터 (토큰 저장 + 에러 핸들링)
 apiClient.interceptors.response.use(
   (response) => {
+    // 응답에 accessToken이 있으면 로컬스토리지에 저장
+    if (typeof window !== 'undefined') {
+      const { accessToken, expiresIn } = response.data;
+      if (accessToken) {
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('expiresIn', expiresIn);
+        // 사용자 정보도 저장 (선택)
+        if (response.data.user) {
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+        }
+      }
+    }
     return response;
   },
-  (error: AxiosError) => {
-    // 에러 메시지 처리
+  (error: AxiosError<ApiErrorResponse>) => {
+    // 사용자 친화적 에러 메시지 생성
     if (error.response) {
       // 서버가 응답을 보냈지만 2xx 범위를 벗어난 상태 코드
-      console.error('API Error:', error.response.status, error.response.data);
+      const status = error.response.status;
+      const data = error.response.data;
+
+      const errorMessage = data?.error?.message || data?.message || '요청 처리에 실패했습니다';
+
+      console.error(`[API Error] ${status}:`, errorMessage);
+
+      // 토큰 만료 시 로컬스토리지 정리
+      if (status === 401 && typeof window !== 'undefined') {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('expiresIn');
+        localStorage.removeItem('user');
+      }
     } else if (error.request) {
       // 요청이 전송되었지만 응답을 받지 못함
-      console.error('Network Error:', error.message);
+      console.error('Network Error: 서버에 연결할 수 없습니다');
     } else {
       // 요청 설정 중 오류 발생
       console.error('Request Error:', error.message);

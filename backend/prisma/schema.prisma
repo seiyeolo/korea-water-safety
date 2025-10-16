@@ -69,6 +69,10 @@ model User {
   role              UserRole            @default(USER)
   status            UserStatus          @default(ACTIVE)
 
+  // 토큰
+  refreshToken      String?             // Refresh 토큰 저장
+  refreshTokenExpiry DateTime?           // Refresh 토큰 만료일
+
   // 관계
   registrations     Registration[]
   certificates      Certificate[]

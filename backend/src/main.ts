@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { HttpExceptionFilter, AllExceptionsFilter } from './common/filters/exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -48,6 +49,9 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
+  // 글로벌 예외 필터 등록 (ValidationPipe 에러 처리 포함)
+  app.useGlobalFilters(new AllExceptionsFilter());
+
   // 전역 Validation Pipe 설정
   app.useGlobalPipes(
     new ValidationPipe({
@@ -71,6 +75,7 @@ async function bootstrap() {
   console.log(`🚀 Server is running on: http://localhost:${port}`);
   console.log(`📖 API Documentation: http://localhost:${port}/api`);
   console.log(`🌐 CORS enabled for patterns: ${corsPatterns.join(', ')}`);
+  console.log(`🔐 JWT Authentication enabled`);
 }
 
 bootstrap();

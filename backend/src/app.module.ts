@@ -7,6 +7,7 @@ import { ProgramsModule } from './modules/programs/programs.module';
 import { PostsModule } from './modules/posts/posts.module';
 import { UsersModule } from './modules/users/users.module';
 import { CertificatesModule } from './certificates/certificates.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -17,6 +18,8 @@ import { CertificatesModule } from './certificates/certificates.module';
     }),
     // Prisma 모듈
     PrismaModule,
+    // Auth 모듈 (JWT, Passport)
+    AuthModule,
     // Feature 모듈들
     ProgramsModule,
     PostsModule,
