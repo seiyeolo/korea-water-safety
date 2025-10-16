@@ -18,7 +18,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('https://strong-wholeness-production.up.railway.app/api/users/login', {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/users/login` : 'http://localhost:4000/api/users/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -33,11 +33,13 @@ export default function LoginPage() {
 
       // 로그인 성공
       if (data.success) {
-        // 사용자 정보를 localStorage에 저장
+        // 토큰과 사용자 정보를 localStorage에 저장
+        localStorage.setItem('accessToken', data.accessToken);
+        localStorage.setItem('refreshToken', data.refreshToken);
         localStorage.setItem('user', JSON.stringify(data.user));
 
-        // 홈으로 리다이렉트
-        router.push('/');
+        // 대시보드로 리다이렉트
+        router.push('/dashboard');
       }
     } catch (err) {
       console.error('Login error:', err);

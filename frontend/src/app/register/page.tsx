@@ -37,7 +37,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('https://strong-wholeness-production.up.railway.app/api/users/register', {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/users/register` : 'http://localhost:4000/api/users/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
