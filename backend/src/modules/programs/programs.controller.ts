@@ -1,10 +1,12 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
 import { ProgramsService } from './programs.service';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('programs')
 export class ProgramsController {
   constructor(private readonly programsService: ProgramsService) {}
 
+  @Public()
   @Get()
   async findAll(@Query('isActive') isActive?: string) {
     // isActive가 명시적으로 전달되지 않으면 undefined로 전달 (모든 프로그램 반환)
@@ -12,6 +14,7 @@ export class ProgramsController {
     return this.programsService.findAll(isActiveFilter);
   }
 
+  @Public()
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.programsService.findOne(id);

@@ -1,11 +1,13 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { PostCategory } from '@prisma/client';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
+  @Public()
   @Get()
   async findAll(
     @Query('category') category?: PostCategory,
@@ -19,6 +21,7 @@ export class PostsController {
     });
   }
 
+  @Public()
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.postsService.findOne(id);

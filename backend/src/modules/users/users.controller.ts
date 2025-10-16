@@ -9,6 +9,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Public()
   @Get()
   async findAll() {
     return this.usersService.findAll();
@@ -19,16 +20,19 @@ export class UsersController {
     return this.usersService.findOne(user.id);
   }
 
+  @Public()
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
 
+  @Public()
   @Get(':id/registrations')
   async getUserRegistrations(@Param('id') id: string) {
     return this.usersService.getUserRegistrations(id);
   }
 
+  @Public()
   @Get(':id/certificates')
   async getUserCertificates(@Param('id') id: string) {
     return this.usersService.getUserCertificates(id);
