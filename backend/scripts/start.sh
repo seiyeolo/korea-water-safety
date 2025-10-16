@@ -1,20 +1,16 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Starting deployment process..."
+echo "🚀 Starting backend application..."
 
-# Run Prisma migrations
+# Run migrations
 echo "📦 Running database migrations..."
 npx prisma migrate deploy
 
-# Run seed only if SKIP_SEED is not set
-if [ "$SKIP_SEED" != "true" ]; then
-  echo "🌱 Checking if database needs seeding..."
-  npm run seed:prod || echo "⚠️ Seed skipped or already completed"
-else
-  echo "⏭️ Skipping seed (SKIP_SEED=true)"
-fi
+# Seed database (optional)
+echo "🌱 Seeding database (if needed)..."
+npm run seed:prod || true
 
-# Start the application
-echo "🎯 Starting application..."
-exec npm start
+# Start application
+echo "⚡ Starting NestJS application..."
+node dist/main.js
