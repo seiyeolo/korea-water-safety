@@ -158,6 +158,30 @@ export const getPostById = async (id: string): Promise<Post> => {
 // ==================== 회원 ====================
 
 /**
+ * 회원가입
+ */
+export const registerUser = async (data: {
+  email: string;
+  password: string;
+  name: string;
+  phone?: string;
+}): Promise<{ success: boolean; message: string; user: User; accessToken: string; refreshToken: string; expiresIn: number; refreshTokenExpiry: number }> => {
+  const response = await apiClient.post('/users/register', data);
+  return response.data;
+};
+
+/**
+ * 로그인
+ */
+export const loginUser = async (data: {
+  email: string;
+  password: string;
+}): Promise<{ success: boolean; message: string; user: User; accessToken: string; refreshToken: string; expiresIn: number; refreshTokenExpiry: number }> => {
+  const response = await apiClient.post('/users/login', data);
+  return response.data;
+};
+
+/**
  * 회원 목록 조회
  */
 export const getUsers = async (params?: GetUsersParams): Promise<User[]> => {
@@ -215,6 +239,8 @@ export const api = {
 
   // 회원
   users: {
+    register: registerUser,
+    login: loginUser,
     list: getUsers,
     get: getUserById,
     registrations: getUserRegistrations,
