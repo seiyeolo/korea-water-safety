@@ -15,6 +15,15 @@ export interface AuthTokens {
   refreshTokenExpiry?: number;
 }
 
+/**
+ * 토큰 생성에 필요한 최소 사용자 정보
+ */
+export interface TokenUser {
+  id: string;
+  email: string;
+  role: string;
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -42,20 +51,16 @@ export class AuthService {
 
   /**
    * JWT 토큰 검증
+   * @throws JsonWebTokenError, TokenExpiredError
    */
   verifyToken(token: string): JwtPayload {
-    try {
-      const decoded = this.jwtService.verify(token);
-      return decoded;
-    } catch (error) {
-      throw error;
-    }
+    return this.jwtService.verify<JwtPayload>(token);
   }
 
   /**
    * Access + Refresh 토큰과 함께 사용자 정보 반환
    */
-  generateAuthResponse(user: any): AuthTokens {
+  generateAuthResponse(user: TokenUser): AuthTokens {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,

@@ -6,7 +6,13 @@ import {
 import { CanActivate } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
 import { PUBLIC_KEY } from '../decorators/public.decorator';
+import { JwtPayload } from '../auth.service';
+
+interface JwtError extends Error {
+  name: 'TokenExpiredError' | 'JsonWebTokenError' | string;
+}
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -26,7 +32,7 @@ export class JwtAuthGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<Request>();
     const token = this.extractToken(request);
 
     if (!token) {
@@ -34,18 +40,19 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     try {
-      const payload = this.jwtService.verify(token);
-      request.user = {
+      const payload = this.jwtService.verify<JwtPayload>(token);
+      (request as Request & { user: object }).user = {
         id: payload.sub,
         email: payload.email,
         role: payload.role,
       };
       return true;
-    } catch (error: any) {
-      if (error.name === 'TokenExpiredError') {
+    } catch (error: unknown) {
+      const jwtError = error as JwtError;
+      if (jwtError.name === 'TokenExpiredError') {
         throw new UnauthorizedException('토큰이 만료되었습니다');
       }
-      if (error.name === 'JsonWebTokenError') {
+      if (jwtError.name === 'JsonWebTokenError') {
         throw new UnauthorizedException('유효하지 않은 토큰입니다');
       }
       throw new UnauthorizedException('인증에 실패했습니다');
@@ -55,7 +62,7 @@ export class JwtAuthGuard implements CanActivate {
   /**
    * Authorization 헤더에서 Bearer 토큰 추출
    */
-  private extractToken(request: any): string | null {
+  private extractToken(request: Request): string | null {
     const authHeader = request.headers.authorization;
     if (!authHeader) {
       return null;
