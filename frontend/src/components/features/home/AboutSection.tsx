@@ -1,135 +1,127 @@
 import Link from 'next/link';
+import { BookOpen, Award, Users, ArrowRight, Target, Heart } from 'lucide-react';
+
+const features = [
+  {
+    icon: BookOpen,
+    title: '전문 교육 프로그램',
+    description: '기초부터 전문가 과정까지 단계별 맞춤 교육 제공',
+    color: 'bg-blue-500',
+    lightColor: 'bg-blue-50',
+    textColor: 'text-blue-600',
+  },
+  {
+    icon: Award,
+    title: '자격증 발급',
+    description: '국가 공인 수상안전 자격증 발급 및 관리',
+    color: 'bg-emerald-500',
+    lightColor: 'bg-emerald-50',
+    textColor: 'text-emerald-600',
+  },
+  {
+    icon: Users,
+    title: '봉사 활동',
+    description: '지역사회와 함께하는 수상안전 캠페인 및 교육',
+    color: 'bg-violet-500',
+    lightColor: 'bg-violet-50',
+    textColor: 'text-violet-600',
+  },
+];
 
 export function AboutSection() {
   return (
-    <section className="bg-gray-50 py-20">
-      <div className="container mx-auto px-4">
+    <section className="relative overflow-hidden bg-slate-50 py-24">
+      {/* 배경 장식 */}
+      <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2">
+        <div className="h-96 w-96 rounded-full bg-blue-100/50 blur-3xl" />
+      </div>
+      <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2">
+        <div className="h-96 w-96 rounded-full bg-cyan-100/50 blur-3xl" />
+      </div>
+
+      <div className="container relative mx-auto px-4">
         <div className="mx-auto max-w-6xl">
           {/* 섹션 헤더 */}
-          <div className="mb-12 text-center">
-            <h2 className="mb-4 text-4xl font-bold text-gray-900">
+          <div className="mb-16 text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-2">
+              <Target className="h-4 w-4 text-blue-600" />
+              <span className="text-sm font-semibold text-blue-600">About Us</span>
+            </div>
+            <h2 className="mb-4 text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl">
               한국수상안전협회를 소개합니다
             </h2>
-            <p className="text-lg text-gray-600">
+            <p className="mx-auto max-w-2xl text-lg text-slate-600">
               대한민국 수상안전 교육을 선도하는 전문 기관
             </p>
           </div>
 
           {/* 주요 내용 */}
-          <div className="grid gap-8 md:grid-cols-2">
+          <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
             {/* 왼쪽: 협회 소개 */}
-            <div className="card">
-              <h3 className="mb-4 text-2xl font-bold text-primary-600">
-                우리의 미션
+            <div className="flex flex-col justify-center">
+              <div className="mb-6 inline-flex items-center gap-2">
+                <Heart className="h-6 w-6 text-rose-500" />
+                <span className="text-sm font-semibold uppercase tracking-wider text-slate-500">
+                  Our Mission
+                </span>
+              </div>
+              <h3 className="mb-6 text-2xl font-bold text-slate-900 sm:text-3xl">
+                안전한 수상 환경을 위한
+                <br />
+                <span className="text-blue-600">우리의 사명</span>
               </h3>
-              <p className="mb-4 leading-relaxed text-gray-700">
+              <p className="mb-6 text-lg leading-relaxed text-slate-600">
                 한국수상안전협회는 1999년 설립 이래 수상안전 교육과 자격증
                 발급을 통해 안전한 수상 환경 조성에 앞장서고 있습니다.
               </p>
-              <p className="mb-6 leading-relaxed text-gray-700">
+              <p className="mb-8 text-lg leading-relaxed text-slate-600">
                 전문적이고 체계적인 교육 프로그램을 통해 수상안전요원,
                 수상안전강사 등 전문 인력을 양성하고 있으며, 전국 해수욕장 및
                 수상레저 시설의 안전관리를 지원하고 있습니다.
               </p>
               <Link
                 href="/about"
-                className="inline-flex items-center text-primary-600 hover:text-primary-700"
+                className="group inline-flex items-center gap-2 text-lg font-semibold text-blue-600 transition-colors hover:text-blue-700"
               >
                 더 알아보기
-                <svg
-                  className="ml-2 h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
+                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
 
-            {/* 오른쪽: 주요 활동 */}
+            {/* 오른쪽: 주요 활동 카드 */}
             <div className="space-y-4">
-              <div className="card hover:shadow-lg transition-shadow">
-                <div className="mb-3 flex items-center">
-                  <div className="mr-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary-100">
-                    <svg
-                      className="h-6 w-6 text-primary-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                      />
-                    </svg>
+              {features.map((feature, index) => (
+                <div
+                  key={index}
+                  className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-slate-300 hover:shadow-lg"
+                >
+                  <div className="flex items-start gap-5">
+                    <div className={`flex-shrink-0 rounded-xl ${feature.lightColor} p-4`}>
+                      <feature.icon className={`h-7 w-7 ${feature.textColor}`} />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="mb-2 text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                        {feature.title}
+                      </h4>
+                      <p className="text-slate-600">
+                        {feature.description}
+                      </p>
+                    </div>
+                    <ArrowRight className="h-5 w-5 flex-shrink-0 text-slate-300 transition-all group-hover:translate-x-1 group-hover:text-blue-500" />
                   </div>
-                  <h4 className="text-lg font-bold text-gray-900">
-                    전문 교육 프로그램
-                  </h4>
                 </div>
-                <p className="text-gray-600">
-                  기초부터 전문가 과정까지 단계별 맞춤 교육 제공
-                </p>
-              </div>
+              ))}
 
-              <div className="card hover:shadow-lg transition-shadow">
-                <div className="mb-3 flex items-center">
-                  <div className="mr-4 flex h-12 w-12 items-center justify-center rounded-lg bg-secondary-100">
-                    <svg
-                      className="h-6 w-6 text-secondary-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                      />
-                    </svg>
-                  </div>
-                  <h4 className="text-lg font-bold text-gray-900">
-                    자격증 발급
-                  </h4>
+              {/* 추가 통계 카드 */}
+              <div className="grid grid-cols-2 gap-4 pt-4">
+                <div className="rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 p-6 text-white">
+                  <div className="text-4xl font-bold">25+</div>
+                  <div className="mt-1 text-blue-100">년의 경험</div>
                 </div>
-                <p className="text-gray-600">
-                  국가 공인 수상안전 자격증 발급 및 관리
-                </p>
-              </div>
-
-              <div className="card hover:shadow-lg transition-shadow">
-                <div className="mb-3 flex items-center">
-                  <div className="mr-4 flex h-12 w-12 items-center justify-center rounded-lg bg-green-100">
-                    <svg
-                      className="h-6 w-6 text-green-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                      />
-                    </svg>
-                  </div>
-                  <h4 className="text-lg font-bold text-gray-900">
-                    봉사 활동
-                  </h4>
+                <div className="rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 p-6 text-white">
+                  <div className="text-4xl font-bold">98%</div>
+                  <div className="mt-1 text-slate-300">교육 만족도</div>
                 </div>
-                <p className="text-gray-600">
-                  지역사회와 함께하는 수상안전 캠페인 및 교육
-                </p>
               </div>
             </div>
           </div>

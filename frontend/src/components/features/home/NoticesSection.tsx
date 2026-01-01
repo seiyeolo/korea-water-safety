@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Bell, Calendar, Eye, Pin, ChevronRight, ArrowRight } from 'lucide-react';
 
 const notices = [
   {
@@ -33,134 +34,96 @@ const notices = [
   },
 ];
 
+const getCategoryStyle = (category: string) => {
+  switch (category) {
+    case '교육':
+      return 'bg-blue-100 text-blue-700';
+    case '자격증':
+      return 'bg-emerald-100 text-emerald-700';
+    default:
+      return 'bg-slate-100 text-slate-700';
+  }
+};
+
 export function NoticesSection() {
   return (
-    <section className="bg-gray-50 py-20">
+    <section className="bg-slate-50 py-24">
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-6xl">
           {/* 섹션 헤더 */}
-          <div className="mb-12 flex items-center justify-between">
+          <div className="mb-12 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
             <div>
-              <h2 className="mb-2 text-4xl font-bold text-gray-900">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-2">
+                <Bell className="h-4 w-4 text-amber-600" />
+                <span className="text-sm font-semibold text-amber-600">Notice</span>
+              </div>
+              <h2 className="mb-2 text-3xl font-bold text-slate-900 sm:text-4xl">
                 공지사항
               </h2>
-              <p className="text-lg text-gray-600">
+              <p className="text-lg text-slate-600">
                 한국수상안전협회의 최신 소식을 확인하세요
               </p>
             </div>
             <Link
               href="/notices"
-              className="hidden rounded-lg border-2 border-gray-300 px-6 py-3 font-semibold text-gray-700 transition-all hover:border-primary-600 hover:text-primary-600 md:block"
+              className="group hidden items-center gap-2 rounded-xl border-2 border-slate-300 bg-white px-6 py-3 font-semibold text-slate-700 transition-all hover:border-blue-600 hover:text-blue-600 md:inline-flex"
             >
               전체보기
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
 
           {/* 공지사항 리스트 */}
           <div className="space-y-4">
-            {notices.map((notice) => (
+            {notices.map((notice, index) => (
               <Link
                 key={notice.id}
                 href={`/notices/${notice.id}`}
-                className="card group block hover:shadow-lg transition-all"
+                className="group block overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-slate-300 hover:shadow-lg"
               >
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     {/* 상단: 카테고리 및 고정 표시 */}
-                    <div className="mb-3 flex items-center gap-2">
+                    <div className="mb-4 flex flex-wrap items-center gap-2">
                       {notice.isPinned && (
-                        <span className="flex items-center rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-800">
-                          <svg
-                            className="mr-1 h-3 w-3"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
-                          </svg>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700">
+                          <Pin className="h-3 w-3" />
                           공지
                         </span>
                       )}
                       <span
-                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                          notice.category === '교육'
-                            ? 'bg-blue-100 text-blue-800'
-                            : notice.category === '자격증'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
-                        }`}
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${getCategoryStyle(notice.category)}`}
                       >
                         {notice.category}
                       </span>
                     </div>
 
                     {/* 제목 */}
-                    <h3 className="mb-2 text-xl font-bold text-gray-900 group-hover:text-primary-600 transition-colors">
+                    <h3 className="mb-3 text-xl font-bold text-slate-900 transition-colors group-hover:text-blue-600">
                       {notice.title}
                     </h3>
 
                     {/* 요약 */}
-                    <p className="mb-4 text-gray-600 line-clamp-2">
+                    <p className="mb-4 text-slate-600 line-clamp-2">
                       {notice.excerpt}
                     </p>
 
                     {/* 하단 정보 */}
-                    <div className="flex items-center gap-4 text-sm text-gray-500">
-                      <span className="flex items-center">
-                        <svg
-                          className="mr-1 h-4 w-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                          />
-                        </svg>
+                    <div className="flex items-center gap-5 text-sm text-slate-500">
+                      <span className="inline-flex items-center gap-1.5">
+                        <Calendar className="h-4 w-4" />
                         {notice.date}
                       </span>
-                      <span className="flex items-center">
-                        <svg
-                          className="mr-1 h-4 w-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                          />
-                        </svg>
+                      <span className="inline-flex items-center gap-1.5">
+                        <Eye className="h-4 w-4" />
                         {notice.views.toLocaleString()}
                       </span>
                     </div>
                   </div>
 
                   {/* 화살표 아이콘 */}
-                  <div className="ml-4 flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 group-hover:bg-primary-100 transition-colors">
-                    <svg
-                      className="h-5 w-5 text-gray-600 group-hover:text-primary-600 transition-colors"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-slate-100 transition-all group-hover:bg-blue-100">
+                    <ChevronRight className="h-6 w-6 text-slate-400 transition-all group-hover:translate-x-0.5 group-hover:text-blue-600" />
                   </div>
                 </div>
               </Link>
@@ -168,25 +131,13 @@ export function NoticesSection() {
           </div>
 
           {/* 모바일 전체보기 버튼 */}
-          <div className="mt-8 text-center md:hidden">
+          <div className="mt-10 text-center md:hidden">
             <Link
               href="/notices"
-              className="inline-flex items-center rounded-lg border-2 border-gray-300 px-6 py-3 font-semibold text-gray-700 transition-all hover:border-primary-600 hover:text-primary-600"
+              className="group inline-flex items-center gap-2 rounded-xl border-2 border-slate-300 bg-white px-6 py-3 font-semibold text-slate-700 transition-all hover:border-blue-600 hover:text-blue-600"
             >
               전체 공지사항 보기
-              <svg
-                className="ml-2 h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
-              </svg>
+              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
         </div>
